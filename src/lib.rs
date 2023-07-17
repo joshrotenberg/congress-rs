@@ -107,7 +107,7 @@ impl ClientBuilder<WithoutApiKey> {
     }
 
     /// Set the api.congress.gov API key. An API key is required to call the `build` method.
-    /// ```
+    /// ```no_run
     /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
     /// # async fn run() -> congress::Result<()> {
     /// # let client = ClientBuilder::new().api_key("test").build()?;
@@ -177,6 +177,15 @@ impl Client {
     }
 
     /// Get the previous page of the results for the given response, if any.
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
+    /// let bills: BillsResponse = client.bills().offset(2).bills().await?;
+    /// let next: Option<congress::Result<BillsResponse>> = client.previous(&bills).await;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn previous<T>(&self, response: &T) -> Option<Result<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
@@ -188,6 +197,15 @@ impl Client {
     }
 
     /// Get the next page of the results for the given response, if any.
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
+    /// let bills: BillsResponse = client.bills().bills().await?;
+    /// let next: Option<congress::Result<BillsResponse>> = client.next(&bills).await;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn next<T>(&self, response: &T) -> Option<Result<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
