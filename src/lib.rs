@@ -66,16 +66,26 @@ pub struct WithoutApiKey;
 
 impl ClientBuilder<WithoutApiKey> {
     /// Get a new, default client.
-    /// ```
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let builder = ClientBuilder::new();
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn new() -> ClientBuilder<WithoutApiKey> {
         ClientBuilder::default()
     }
 
     /// Change the API base url from the default.
-    /// ```
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let builder = ClientBuilder::new().base_url("http://i.know.what.im.doing.com");
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn base_url(mut self, base_url: impl IntoUrl) -> Result<Self> {
         self.base_url = base_url.into_url().context(InvalidBaseUrlSnafu)?;
@@ -83,8 +93,13 @@ impl ClientBuilder<WithoutApiKey> {
     }
 
     /// Change the client user agent from the default.
-    /// ```
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let builder = ClientBuilder::new().user_agent("my-special-client/0.1.2");
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn user_agent(mut self, user_agent: impl Into<String>) -> Self {
         self.user_agent = user_agent.into();
@@ -93,7 +108,12 @@ impl ClientBuilder<WithoutApiKey> {
 
     /// Set the api.congress.gov API key. An API key is required to call the `build` method.
     /// ```
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let builder = ClientBuilder::new().api_key("my-secret-key");
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn api_key(self, api_key: impl Into<String>) -> ClientBuilder<WithApiKey> {
         ClientBuilder {
@@ -107,8 +127,13 @@ impl ClientBuilder<WithoutApiKey> {
 
 impl ClientBuilder<WithApiKey> {
     /// Build a new Client instance.
-    /// ```
+    /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let builder = ClientBuilder::new().api_key("my-secret-key").build()?;
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn build(&self) -> Result<Client> {
         let client = reqwest::ClientBuilder::new()
@@ -140,7 +165,12 @@ impl Client {
 
     /// Get the most recent bills, or narrow the search by Congress and Bill type.
     /// ```no_run
+    /// # use congress::{bills::BillsResponse, Client, ClientBuilder};
+    /// # async fn run() -> congress::Result<()> {
+    /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let bills: BillsResponse = client.bills().bills().await?;
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn bills(&self) -> BillsHandler {
         BillsHandler::new(self)
