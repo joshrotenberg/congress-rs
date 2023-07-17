@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize, Serializer};
 
-const DATE_FORMAT: &'static str = "%Y-%m-%dT%H:%M:%SZ";
+const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%SZ";
 
 pub(crate) fn date_serialize<S>(
     date: &Option<DateTime<Utc>>,

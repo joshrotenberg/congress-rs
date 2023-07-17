@@ -28,7 +28,7 @@ pub struct BillsHandler<'client> {
 impl<'client> BillsHandler<'client> {
     pub fn new(client: &'client Client) -> BillsHandler<'client> {
         BillsHandler {
-            client: client,
+            client,
             congress: None,
             bill_type: None,
             params: Parameters::default(),
@@ -53,7 +53,7 @@ impl<'client> BillsHandler<'client> {
         if let Some(bill_type) = &self.bill_type {
             path.push_str(format!("/{bill_type}").as_str());
         }
-        Ok(self.client.get(&path, Some(&self.params)).await?)
+        self.client.get(&path, Some(&self.params)).await
     }
 }
 
