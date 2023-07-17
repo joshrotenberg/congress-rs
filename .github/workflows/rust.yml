@@ -8,15 +8,26 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  CONGRESS_TEST_API_KEY: ${{ secrets.CONGRESS_TEST_API_KEY }}
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        channel: [stable, beta, nightly]
+        os: [ubuntu, macos, windows]
     steps:
     - uses: actions/checkout@v3
+    - run: rustup default ${{ matrix.channel }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy
