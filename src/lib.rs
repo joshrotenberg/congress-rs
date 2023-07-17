@@ -1,3 +1,7 @@
+//! # Congress
+//!
+//! `congress-rs` is a client for the United States Congress API found at <https://api.congress.gov>.
+//!
 use bills::BillsHandler;
 use error::{ClientSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonPathToSnafu};
 use page::PagedResponse;
@@ -35,6 +39,7 @@ pub mod treaties;
 static DEFAULT_BASE_URL: &str = "https://api.congress.gov/";
 static DEFAULT_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),);
 
+/// A Client builder.
 #[derive(Debug)]
 pub struct ClientBuilder<State> {
     base_url: Url,
@@ -60,20 +65,36 @@ pub struct WithApiKey;
 pub struct WithoutApiKey;
 
 impl ClientBuilder<WithoutApiKey> {
+    /// Get a new, default client.
+    /// ```
+    /// let builder = ClientBuilder::new();
+    /// ```
     pub fn new() -> ClientBuilder<WithoutApiKey> {
         ClientBuilder::default()
     }
 
+    /// Change the API base url from the default.
+    /// ```
+    /// let builder = ClientBuilder::new().base_url("http://i.know.what.im.doing.com");
+    /// ```
     pub fn base_url(mut self, base_url: impl IntoUrl) -> Result<Self> {
         self.base_url = base_url.into_url().context(InvalidBaseUrlSnafu)?;
         Ok(self)
     }
 
+    /// Change the client user agent from the default.
+    /// ```
+    /// let builder = ClientBuilder::new().user_agent("my-special-client/0.1.2");
+    /// ```
     pub fn user_agent(mut self, user_agent: impl Into<String>) -> Self {
         self.user_agent = user_agent.into();
         self
     }
 
+    /// Set the api.congress.gov API key. An API key is required to call the `build` method.
+    /// ```
+    /// let builder = ClientBuilder::new().api_key("my-secret-key");
+    /// ```
     pub fn api_key(self, api_key: impl Into<String>) -> ClientBuilder<WithApiKey> {
         ClientBuilder {
             base_url: self.base_url,
@@ -85,6 +106,10 @@ impl ClientBuilder<WithoutApiKey> {
 }
 
 impl ClientBuilder<WithApiKey> {
+    /// Build a new Client instance.
+    /// ```
+    /// let builder = ClientBuilder::new().api_key("my-secret-key").build()?;
+    /// ```
     pub fn build(&self) -> Result<Client> {
         let client = reqwest::ClientBuilder::new()
             .user_agent(self.user_agent.clone())
@@ -99,6 +124,7 @@ impl ClientBuilder<WithApiKey> {
     }
 }
 
+/// The client.
 #[derive(Debug)]
 pub struct Client {
     client: reqwest::Client,
@@ -107,14 +133,20 @@ pub struct Client {
 }
 
 impl Client {
+    /// Get a new `ClientBuilder`.
     pub fn builder() -> ClientBuilder<WithoutApiKey> {
         ClientBuilder::default()
     }
 
+    /// Get the most recent bills, or narrow the search by Congress and Bill type.
+    /// ```no_run
+    /// let bills: BillsResponse = client.bills().bills().await?;
+    /// ```
     pub fn bills(&self) -> BillsHandler {
         BillsHandler::new(self)
     }
 
+    /// Get the previous page of the results for the given response, if any.
     pub async fn previous<T>(&self, response: &T) -> Option<Result<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
@@ -125,6 +157,7 @@ impl Client {
         }
     }
 
+    /// Get the next page of the results for the given response, if any.
     pub async fn next<T>(&self, response: &T) -> Option<Result<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
