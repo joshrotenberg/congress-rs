@@ -59,6 +59,10 @@ pub enum Error {
         source: serde_path_to_error::Error<serde_json::Error>,
     },
 
+    /// A URL Decoding error
+    #[snafu(display("URL Decoding Error: {}", source))]
+    UrlDecodingError { source: serde_urlencoded::de::Error },
+
     #[snafu(display("Congress API Error: {}", source))]
     Congress {
         /// The source error
