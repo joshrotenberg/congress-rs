@@ -4,6 +4,7 @@
 //!
 use bills::BillsHandler;
 use error::{ClientSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonPathToSnafu};
+use hyper_tls::HttpsConnector;
 use page::PagedResponse;
 use reqwest::IntoUrl;
 use serde::{self, Serialize};
@@ -43,6 +44,7 @@ static DEFAULT_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CAR
 #[derive(Debug)]
 pub struct ClientBuilder<State> {
     base_url: Url,
+    base_url2: hyper::Uri,
     user_agent: String,
     api_key: Option<String>,
     state: PhantomData<State>,
@@ -54,6 +56,7 @@ impl Default for ClientBuilder<WithoutApiKey> {
             base_url: Url::parse(DEFAULT_BASE_URL)
                 .context(InvalidUrlSnafu)
                 .unwrap(),
+            base_url2: DEFAULT_BASE_URL.parse().unwrap(),
             user_agent: DEFAULT_USER_AGENT.into(),
             api_key: None,
             state: PhantomData,
@@ -118,6 +121,7 @@ impl ClientBuilder<WithoutApiKey> {
     pub fn api_key(self, api_key: impl Into<String>) -> ClientBuilder<WithApiKey> {
         ClientBuilder {
             base_url: self.base_url,
+            base_url2: self.base_url2,
             user_agent: self.user_agent,
             api_key: Some(api_key.into()),
             state: PhantomData,
@@ -141,6 +145,8 @@ impl ClientBuilder<WithApiKey> {
             .build()
             .context(ClientSnafu)?;
 
+        let https = HttpsConnector::new();
+        let client2 = hyper::Client::builder().build::<_, hyper::Body>(https);
         Ok(Client {
             client,
             base_url: self.base_url.clone(),
@@ -186,13 +192,16 @@ impl Client {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn previous<T>(&self, response: &T) -> Option<Result<T>>
+    pub async fn previous<T>(&self, response: &T) -> Result<Option<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
     {
         match response.previous() {
-            Some(url) => Some(Ok(self.get(url.path(), None::<&()>).await.unwrap())),
-            _ => None,
+            Some(url) => {
+                let previous: T = self.get(url.path(), url.query()).await?;
+                Ok(Some(previous))
+            }
+            _ => Ok(None),
         }
     }
 
@@ -206,13 +215,16 @@ impl Client {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn next<T>(&self, response: &T) -> Option<Result<T>>
+    pub async fn next<T>(&self, response: &T) -> Result<Option<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse,
     {
         match response.next() {
-            Some(url) => Some(Ok(self.get(url.path(), None::<&()>).await.unwrap())),
-            _ => None,
+            Some(url) => {
+                let next: T = self.get(url.path(), url.query()).await?;
+                Ok(Some(next))
+            }
+            _ => Ok(None),
         }
     }
 

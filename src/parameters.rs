@@ -1,5 +1,9 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize, Serializer};
+use snafu::ResultExt;
+use std::str::FromStr;
+
+use crate::error::{CongressError, UrlDecodingSnafu};
 
 const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%SZ";
 
@@ -14,13 +18,14 @@ where
     serializer.serialize_str(&s)
 }
 
+/// Item sort options
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Sort {
     /// Sort by the item's update date in ascending order
-    // #[serde(rename(serialize = "updateDate+asc"))]
+    #[serde(rename(serialize = "updateDate asc"))]
     UpdateDateAscending,
     /// Sort by the item's update date in ascending order
-    // #[serde(rename(serialize = "updateDate+desc"))]
+    #[serde(rename(serialize = "updateDate desc"))]
     UpdateDateDescending,
 }
 
@@ -89,4 +94,24 @@ pub(crate) mod macros {
         )+};
 }
     pub(crate) use implement_page_params;
+}
+
+impl FromStr for Parameters {
+    type Err = serde_urlencoded::de::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_urlencoded::from_str::<Parameters>(s)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parameters_from_string() -> crate::Result<()> {
+        let s = "limit=1&offset=2".parse::<Parameters>().unwrap();
+
+        Ok(())
+    }
 }

@@ -63,6 +63,10 @@ pub enum Error {
     #[snafu(display("URL Decoding Error: {}", source))]
     UrlDecodingError { source: serde_urlencoded::de::Error },
 
+    /// A URL Encoding error
+    #[snafu(display("URI Encoding Error: {}", source))]
+    UriError { source: http::Error },
+
     #[snafu(display("Congress API Error: {}", source))]
     Congress {
         /// The source error
