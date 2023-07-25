@@ -1,10 +1,12 @@
 //! # Congress
 //!
-//! `congress-rs` is a client for the United States Congress API found at <https://api.congress.gov>.
+//! `congress-rs` is a client for the United States Congress API: <https://api.congress.gov>
+//!
 //!
 use bills::BillsHandler;
 use error::{ClientSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonPathToSnafu};
 use page::PagedResponse;
+use parameters::Parameters;
 use reqwest::IntoUrl;
 use serde::{self, Serialize};
 use snafu::ResultExt;
@@ -182,7 +184,7 @@ impl Client {
     /// # async fn run() -> congress::Result<()> {
     /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let bills: BillsResponse = client.bills().offset(2).bills().await?;
-    /// let next: Option<congress::Result<BillsResponse>> = client.previous(&bills).await;
+    /// let next: congress::Result<Option<BillsResponse>> = client.previous(&bills).await;
     /// # Ok(())
     /// # }
     /// ```
@@ -192,7 +194,8 @@ impl Client {
     {
         match response.previous() {
             Some(url) => {
-                let previous: T = self.get(url.path(), url.query()).await?;
+                let params: Parameters = url.query().unwrap().parse::<Parameters>().unwrap();
+                let previous: T = self.get(url.path(), Some(&params)).await?;
                 Ok(Some(previous))
             }
             _ => Ok(None),
@@ -205,7 +208,7 @@ impl Client {
     /// # async fn run() -> congress::Result<()> {
     /// # let client = ClientBuilder::new().api_key("test").build()?;
     /// let bills: BillsResponse = client.bills().bills().await?;
-    /// let next: Option<congress::Result<BillsResponse>> = client.next(&bills).await;
+    /// let next: congress::Result<Option<BillsResponse>> = client.next(&bills).await;
     /// # Ok(())
     /// # }
     /// ```
@@ -215,7 +218,9 @@ impl Client {
     {
         match response.next() {
             Some(url) => {
-                let next: T = self.get(url.path(), url.query()).await?;
+                let params: Parameters = url.query().unwrap().parse::<Parameters>().unwrap();
+
+                let next: T = self.get(url.path(), Some(&params)).await?;
                 Ok(Some(next))
             }
             _ => Ok(None),

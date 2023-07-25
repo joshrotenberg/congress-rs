@@ -111,6 +111,8 @@ mod tests {
     #[test]
     fn parameters_from_string() -> crate::Result<()> {
         let s = "limit=1&offset=2".parse::<Parameters>().unwrap();
+        let s = "".parse::<Parameters>().unwrap();
+        dbg!(s);
 
         Ok(())
     }
