@@ -3,6 +3,9 @@
 //! `congress-rs` is a client for the United States Congress API: <https://api.congress.gov>
 //!
 //!
+use amendment::AmendmentHandler;
+use amendment_type::AmendmentType;
+use amendments::AmendmentsHandler;
 use bills::BillsHandler;
 use error::{ClientSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonPathToSnafu};
 use page::PagedResponse;
@@ -16,12 +19,16 @@ use url::Url;
 
 pub use error::Result;
 
+pub mod amendment_type;
 pub mod bill_type;
+pub mod chamber;
 pub mod error;
 pub mod page;
 pub mod parameters;
 
+pub mod amendment;
 pub mod amendments;
+pub mod bill;
 pub mod bills;
 pub mod committee_meetings;
 pub mod committee_prints;
@@ -176,6 +183,19 @@ impl Client {
     /// ```
     pub fn bills(&self) -> BillsHandler {
         BillsHandler::new(self)
+    }
+
+    pub fn amendments(&self) -> AmendmentsHandler {
+        AmendmentsHandler::new(self)
+    }
+
+    pub fn amendment(
+        &self,
+        congress: u32,
+        amendment_type: AmendmentType,
+        amendment_number: u32,
+    ) -> AmendmentHandler {
+        AmendmentHandler::new(self, congress, amendment_type, amendment_number)
     }
 
     /// Get the previous page of the results for the given response, if any.

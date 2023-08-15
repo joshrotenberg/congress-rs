@@ -1,20 +1,40 @@
 use crate::{
-    bill_type::BillType, page::Pagination, parameters::Parameters, Client, PagedResponse, Result,
+    amendment_type::{self, AmendmentType},
+    bill_type::{self, BillType},
+    chamber::Chamber,
+    page::Pagination,
+    parameters::Parameters,
+    Client, Result,
 };
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::Deserialize;
-use std::slice::Iter;
 use url::Url;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize)]
+pub struct LatestAction {
+    pub action_date: NaiveDate,
+    pub text: String,
+}
+
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Bill {
     pub congress: u32,
+    pub latest_action: LatestAction,
+    pub number: String,
+    pub origin_chamber: Chamber,
+    pub origin_chamber_code: String,
+    pub title: String,
+    pub bill_type: BillType,
+    pub update_date: NaiveDate,
+    pub update_date_including_text: DateTime<Utc>,
+    pub url: Url,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct BillsResponse {
-    bills: Vec<Bill>,
-    pagination: Pagination,
+    pub bills: Vec<Bill>,
+    pub pagination: Pagination,
 }
 
 #[derive(Debug)]
@@ -26,7 +46,7 @@ pub struct BillsHandler<'client> {
 }
 
 impl<'client> BillsHandler<'client> {
-    pub fn new(client: &'client Client) -> BillsHandler<'client> {
+    pub fn new(client: &'client Client) -> Self {
         BillsHandler {
             client,
             congress: None,
@@ -45,8 +65,8 @@ impl<'client> BillsHandler<'client> {
         self
     }
 
-    pub async fn bills(&self) -> Result<BillsResponse> {
-        let mut path = String::from("/v3/bill");
+    pub async fn send(&self) -> Result<BillsResponse> {
+        let mut path = String::from("/v3/amendment");
         if let Some(congress) = self.congress {
             path.push_str(format!("/{congress}").as_str());
         }
@@ -58,4 +78,5 @@ impl<'client> BillsHandler<'client> {
 }
 
 crate::parameters::macros::implement_page_params!(BillsHandler);
+crate::parameters::macros::implement_sort_params!(BillsHandler);
 crate::page::macros::implement_paged_response!(BillsResponse, Bill, bills);

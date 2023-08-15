@@ -14,14 +14,15 @@ pub trait PagedResponse {
 }
 
 pub(crate) mod macros {
+
     macro_rules! implement_paged_response  {
         ($($name:ident,$type:ident,$member:ident),+) => {$(
-            impl PagedResponse for $name {
-                fn previous(&self) -> Option<Url> {
+            impl crate::page::PagedResponse for $name {
+                fn previous(&self) -> Option<reqwest::Url> {
                     self.pagination.prev.clone()
                 }
 
-                fn next(&self) -> Option<Url> {
+                fn next(&self) -> Option<reqwest::Url> {
                     self.pagination.next.clone()
                 }
             }
@@ -37,7 +38,7 @@ pub(crate) mod macros {
 
          impl<'iter> IntoIterator for &'iter $name {
              type Item = &'iter $type;
-             type IntoIter = Iter<'iter, $type>;
+             type IntoIter = std::slice::Iter<'iter, $type>;
 
              fn into_iter(self) -> Self::IntoIter {
                  self.$member.iter()

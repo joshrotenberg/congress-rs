@@ -1,9 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize, Serializer};
-use snafu::ResultExt;
 use std::str::FromStr;
-
-use crate::error::{CongressError, UrlDecodingSnafu};
 
 const DATE_FORMAT: &str = "%Y-%m-%dT%H:%M:%SZ";
 
@@ -19,7 +16,7 @@ where
 }
 
 /// Item sort options
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
 pub enum Sort {
     /// Sort by the item's update date in ascending order
     #[serde(rename(serialize = "updateDate asc"))]
@@ -38,7 +35,7 @@ impl std::fmt::Display for Sort {
     }
 }
 
-#[derive(Debug, Deserialize, Default, Serialize)]
+#[derive(Debug, Deserialize, Default, Serialize, Copy, Clone)]
 pub(crate) struct Parameters {
     pub offset: Option<u32>,
     pub limit: Option<u32>,
@@ -62,8 +59,7 @@ pub(crate) mod macros {
     macro_rules! implement_page_params {
     ($($name:ident),+) => {
         $(
-        use chrono::{DateTime, Utc};
-        use crate::parameters::Sort;
+
         impl<'client> $name<'client> {
             pub fn limit(mut self, limit: u32) -> Self {
                 self.params.limit = Some(limit);
@@ -74,18 +70,26 @@ pub(crate) mod macros {
                 self.params.offset = Some(offset);
                 self
             }
+        }
+        )+};
+}
 
-            pub fn from_date(mut self, date: DateTime<Utc>) -> Self {
+    macro_rules! implement_sort_params {
+    ($($name:ident),+) => {
+        $(
+
+        impl<'client> $name<'client> {
+            pub fn from_date(mut self, date: chrono::DateTime<chrono::Utc>) -> Self {
                 self.params.from_date = Some(date);
                 self
             }
 
-            pub fn to_date(mut self, date: DateTime<Utc>) -> Self {
+            pub fn to_date(mut self, date: chrono::DateTime<chrono::Utc>) -> Self {
                 self.params.to_date = Some(date);
                 self
             }
 
-            pub fn sort(mut self, sort: Sort) -> Self
+            pub fn sort(mut self, sort: crate::parameters::Sort) -> Self
         {
             self.params.sort = Some(sort);
             self
@@ -93,7 +97,9 @@ pub(crate) mod macros {
         }
         )+};
 }
+
     pub(crate) use implement_page_params;
+    pub(crate) use implement_sort_params;
 }
 
 impl FromStr for Parameters {
@@ -110,9 +116,8 @@ mod tests {
 
     #[test]
     fn parameters_from_string() -> crate::Result<()> {
-        let s = "limit=1&offset=2".parse::<Parameters>().unwrap();
-        let s = "".parse::<Parameters>().unwrap();
-        dbg!(s);
+        let _s = "limit=1&offset=2".parse::<Parameters>().unwrap();
+        let _s = "".parse::<Parameters>().unwrap();
 
         Ok(())
     }
