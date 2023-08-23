@@ -1,0 +1,19 @@
+[package]
+name = "congress"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+reqwest = { version = "0.11.18", features = ["json"] }
+snafu = "0.7.5"
+url = { version = "2.4.0", features = ["serde"] }
+serde = { version = "1.0.144", features = ["derive"] }
+serde_json = "1.0.85"
+serde_path_to_error = "0.1.9"
+serde_urlencoded = "0.7.1"
+chrono = { version = "0.4.26", features = ["serde"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+
