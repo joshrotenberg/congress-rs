@@ -3,8 +3,8 @@ use bill::BillHandler;
 use bill_type::BillType;
 use bills::BillsHandler;
 use error::{
-    ClientBuildSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonParseSnafu, ResponseSnafu,
-    SendSnafu,
+    ClientBuildSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonParseSnafu, ParameterSnafu,
+    ResponseSnafu, SendSnafu,
 };
 use pagination::PagedResponse;
 use parameters::Parameters;
@@ -50,28 +50,30 @@ impl Client {
     where
         T: serde::de::DeserializeOwned + PagedResponse<R>,
     {
-        match response.previous() {
-            Some(url) => {
-                let params: Parameters = url.query().unwrap().parse::<Parameters>().unwrap();
-                let previous: T = self.get(url.path(), Some(&params)).await?;
-                Ok(Some(previous))
-            }
-            _ => Ok(None),
-        }
+        self.get_page(response.previous()).await
     }
 
     pub async fn next<T, R>(&self, response: &T) -> Result<Option<T>>
     where
         T: serde::de::DeserializeOwned + PagedResponse<R>,
     {
-        match response.next() {
-            Some(url) => {
-                let params: Parameters = url.query().unwrap().parse::<Parameters>().unwrap();
+        self.get_page(response.next()).await
+    }
 
-                let next: T = self.get(url.path(), Some(&params)).await?;
-                Ok(Some(next))
-            }
-            _ => Ok(None),
+    async fn get_page<T, R>(&self, url: Option<Url>) -> Result<Option<T>>
+    where
+        T: serde::de::DeserializeOwned + PagedResponse<R>,
+    {
+        if let Some(url) = url {
+            let params: Parameters = url
+                .query()
+                .expect("Url doesn't have a query'")
+                .parse::<Parameters>()
+                .context(ParameterSnafu)?;
+            let page: T = self.get(url.path(), Some(&params)).await?;
+            Ok(Some(page))
+        } else {
+            Ok(None)
         }
     }
 

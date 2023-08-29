@@ -17,10 +17,8 @@ where
 #[derive(Debug, Deserialize, Serialize, Copy, Clone)]
 pub enum Sort {
     /// Sort by the item's update date in ascending order
-    #[serde(rename(serialize = "updateDate asc"))]
     UpdateDateAscending,
     /// Sort by the item's update date in ascending order
-    #[serde(rename(serialize = "updateDate desc"))]
     UpdateDateDescending,
 }
 

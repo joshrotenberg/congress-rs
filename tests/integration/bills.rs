@@ -14,6 +14,8 @@ async fn bills() -> Result<()> {
         .offset(2)
         .send()
         .await?;
+    let next = client.next(&bills).await?.unwrap();
+    client.previous(&next).await?;
     for _b in bills.into_iter() {}
 
     Ok(())

@@ -8,6 +8,7 @@ pub struct ErrorDetails {
     pub code: String,
     pub message: String,
 }
+
 #[derive(Deserialize, Debug, Clone)]
 #[non_exhaustive]
 pub struct CongressError {
@@ -60,6 +61,9 @@ pub enum Error {
         /// The source error
         source: serde_path_to_error::Error<serde_json::Error>,
     },
+
+    #[snafu(display("Parameter Error: {}", source))]
+    ParameterError { source: serde_urlencoded::de::Error },
 
     #[snafu(display("Congress API Error: {}", source))]
     Congress {
