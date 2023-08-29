@@ -3,16 +3,21 @@ use snafu::Snafu;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+#[derive(Debug, Deserialize, Clone)]
+pub struct ErrorDetails {
+    pub code: String,
+    pub message: String,
+}
 #[derive(Deserialize, Debug, Clone)]
 #[non_exhaustive]
 pub struct CongressError {
-    pub error: String,
+    pub error: ErrorDetails,
 }
 
 impl std::error::Error for CongressError {}
 impl std::fmt::Display for CongressError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.error)?;
+        write!(f, "{}", self.error.message)?;
         Ok(())
     }
 }
@@ -60,5 +65,9 @@ pub enum Error {
     Congress {
         /// The source error
         source: CongressError,
+    },
+
+    Unknown {
+        source: Box<dyn std::error::Error + Send + Sync>,
     },
 }

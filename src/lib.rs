@@ -1,3 +1,6 @@
+#![doc = include_str!("../README.md")]
+use bill::BillHandler;
+use bill_type::BillType;
 use bills::BillsHandler;
 use error::{
     ClientBuildSnafu, InvalidBaseUrlSnafu, InvalidUrlSnafu, JsonParseSnafu, ResponseSnafu,
@@ -16,10 +19,12 @@ pub use error::Result;
 pub mod bill_type;
 pub mod chamber;
 pub mod error;
+pub mod latest_action;
 pub mod pagination;
 pub mod parameters;
 pub mod sort;
 
+pub mod bill;
 pub mod bills;
 
 static DEFAULT_BASE_URL: &str = "https://api.congress.gov/";
@@ -35,6 +40,10 @@ pub struct Client {
 impl Client {
     pub fn bills(&self) -> BillsHandler {
         BillsHandler::new(self)
+    }
+
+    pub fn bill(&self, congress: u32, bill_type: BillType, bill_number: u32) -> BillHandler {
+        BillHandler::new(self, congress, bill_type, bill_number)
     }
 
     pub async fn previous<T, R>(&self, response: &T) -> Result<Option<T>>

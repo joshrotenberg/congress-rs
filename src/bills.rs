@@ -1,6 +1,7 @@
 use crate::{
     bill_type::BillType,
     chamber::{Chamber, ChamberCode},
+    latest_action::LatestAction,
     pagination::{PagedResponse, Pagination},
     parameters::{HasParameters, PageParameters, Parameters, SortParameters},
     Client, Result,
@@ -10,13 +11,6 @@ use serde::Deserialize;
 use url::Url;
 
 // Types
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct LatestAction {
-    pub action_date: NaiveDate,
-    pub text: String,
-}
-
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Bill {
@@ -37,7 +31,7 @@ pub struct Bill {
 #[derive(Debug, Deserialize)]
 pub struct BillsResponse {
     pub bills: Vec<Bill>,
-    pub pagination: Pagination,
+    pagination: Pagination,
 }
 
 impl PagedResponse<Bill> for BillsResponse {
