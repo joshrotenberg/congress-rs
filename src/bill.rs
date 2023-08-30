@@ -3,6 +3,19 @@ use chrono::{DateTime, NaiveDate, Utc};
 use serde::Deserialize;
 use url::Url;
 
+use self::actions::ActionsHandler;
+use self::amendments::AmendmentsHandler;
+
+pub mod actions;
+pub mod amendments;
+pub mod committees;
+pub mod cosponsors;
+pub mod related_bills;
+pub mod subjects;
+pub mod summaries;
+pub mod text;
+pub mod titles;
+
 #[derive(Debug, Deserialize)]
 pub struct Actions {
     pub count: u32,
@@ -169,5 +182,13 @@ impl<'client> BillHandler<'client> {
         );
 
         self.client.get(&path, None::<&()>).await
+    }
+
+    pub fn actions(&self) -> ActionsHandler {
+        ActionsHandler::new(self)
+    }
+
+    pub fn amendments(&self) -> AmendmentsHandler {
+        AmendmentsHandler::new(self)
     }
 }
