@@ -1,19 +1,27 @@
 use super::BillHandler;
 use crate::{
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Summary {}
+pub struct Summary {
+    pub action_date: NaiveDate,
+    pub action_desc: String,
+    pub text: String,
+    pub update_date: DateTime<Utc>,
+    pub version_code: String,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SummariesResponse {
     pub summaries: Vec<Summary>,
+    pagination: Pagination,
 }
 
 #[derive(Debug)]

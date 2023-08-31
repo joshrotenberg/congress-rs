@@ -8,7 +8,7 @@ async fn bills() -> Result<()> {
         .bills()
         .congress(117)
         .bill_type(BillType::House)
-        .limit(250)
+        .limit(5)
         .sort(Sort::UpdateDateAscending)
         .to_date(chrono::offset::Utc::now())
         .offset(2)

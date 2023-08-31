@@ -1,18 +1,36 @@
 use super::BillHandler;
 use crate::{
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use url::Url;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Text {}
+pub struct Format {
+    #[serde(rename = "type")]
+    pub type_: String,
+    url: Url,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TextResponse {}
+pub struct TextVersion {
+    pub date: DateTime<Utc>,
+    pub formats: Vec<Format>,
+    #[serde(rename = "type")]
+    pub type_: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TextResponse {
+    pub text_versions: Vec<TextVersion>,
+    pagination: Pagination,
+}
 
 #[derive(Debug)]
 pub struct TextHandler<'client> {

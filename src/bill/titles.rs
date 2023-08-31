@@ -1,18 +1,29 @@
 use super::BillHandler;
 use crate::{
+    chamber::{Chamber, ChamberCode},
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Title {}
+pub struct Title {
+    pub bill_text_version_code: String,
+    pub bill_text_version_name: String,
+    pub chamber_code: ChamberCode,
+    pub chamber_name: Chamber,
+    pub title: String,
+    pub title_type: String,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TitlesResponse {}
+pub struct TitlesResponse {
+    pub titles: Vec<Title>,
+    pagination: Pagination,
+}
 
 #[derive(Debug)]
 pub struct TitlesHandler<'client> {

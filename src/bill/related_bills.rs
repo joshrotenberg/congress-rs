@@ -1,19 +1,40 @@
 use super::BillHandler;
 use crate::{
+    bill_type::BillType,
+    latest_action::LatestAction,
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
 use serde::Deserialize;
+use url::Url;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RelatedBill {}
+pub struct RelationshipDetail {
+    pub identified_by: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RelatedBill {
+    pub congress: u32,
+    pub latest_action: LatestAction,
+    pub number: u32,
+    pub relationship_details: Vec<RelationshipDetail>,
+    pub title: String,
+    #[serde(rename = "type")]
+    pub bill_type: BillType,
+    pub url: Url,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RelatedBillsResponse {
     pub related_bills: Vec<RelatedBill>,
+    pub(crate) pagination: Pagination,
 }
 
 #[derive(Debug)]

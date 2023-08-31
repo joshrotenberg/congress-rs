@@ -16,6 +16,7 @@ use url::Url;
 
 pub use error::Result;
 
+pub mod amendment_type;
 pub mod bill_type;
 pub mod chamber;
 pub mod error;

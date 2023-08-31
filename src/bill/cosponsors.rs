@@ -1,19 +1,34 @@
 use super::BillHandler;
 use crate::{
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
 use chrono::NaiveDate;
 use serde::Deserialize;
+use url::Url;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Cosponsor {}
+pub struct Cosponsor {
+    pub bioguide_id: String,
+    pub district: u32,
+    pub first_name: String,
+    pub full_name: String,
+    pub is_originial_cosponsor: bool,
+    pub last_name: String,
+    pub middle_name: String,
+    pub party: String,
+    pub sponsorship_date: NaiveDate,
+    pub state: String,
+    pub url: Url,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CosponsorsResponse {
     pub cosponsors: Vec<Cosponsor>,
+    pagination: Pagination,
 }
 
 #[derive(Debug)]

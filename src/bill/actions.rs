@@ -1,5 +1,6 @@
 use super::BillHandler;
 use crate::{
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
@@ -19,6 +20,7 @@ pub enum ActionType {
     Committee,
     IntroReferral,
     Calendars,
+    Floor,
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,6 +37,7 @@ pub struct Action {
 #[derive(Debug, Deserialize)]
 pub struct ActionsResponse {
     pub actions: Vec<Action>,
+    pagination: Pagination,
 }
 
 #[derive(Debug)]

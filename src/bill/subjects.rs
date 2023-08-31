@@ -1,9 +1,9 @@
 use super::BillHandler;
 use crate::{
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -14,8 +14,16 @@ pub struct LegislativeSubject {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct PolicyArea {
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubjectsResponse {
-    // pub Legislative_subjects: Vec<LegislativeSubject>,
+    pub legislative_subjects: Vec<LegislativeSubject>,
+    pub policy_area: PolicyArea,
+    pagination: Pagination,
 }
 
 #[derive(Debug)]

@@ -1,19 +1,42 @@
 use super::BillHandler;
 use crate::{
+    chamber::Chamber,
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
-use chrono::NaiveDate;
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use url::Url;
+
+#[derive(Debug, Deserialize)]
+pub struct Activity {
+    pub date: DateTime<Utc>,
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum CommitteeType {
+    Standing,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Committee {}
+pub struct Committee {
+    pub activities: Vec<Activity>,
+    pub chamber: Chamber,
+    pub name: String,
+    pub system_code: String,
+    #[serde(rename = "type")]
+    pub committee_type: CommitteeType,
+    pub url: Url,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CommitteesResponse {
     pub committees: Vec<Committee>,
+    pagination: Pagination,
 }
 
 #[derive(Debug)]

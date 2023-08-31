@@ -5,6 +5,13 @@ use url::Url;
 
 use self::actions::ActionsHandler;
 use self::amendments::AmendmentsHandler;
+use self::committees::CommitteesHandler;
+use self::cosponsors::CosponsorsHandler;
+use self::related_bills::RelatedBillsHandler;
+use self::subjects::SubjectsHandler;
+use self::summaries::SummariesHandler;
+use self::text::TextHandler;
+use self::titles::TitlesHandler;
 
 pub mod actions;
 pub mod amendments;
@@ -190,5 +197,33 @@ impl<'client> BillHandler<'client> {
 
     pub fn amendments(&self) -> AmendmentsHandler {
         AmendmentsHandler::new(self)
+    }
+
+    pub fn committees(&self) -> CommitteesHandler {
+        CommitteesHandler::new(self)
+    }
+
+    pub fn cosponsors(&self) -> CosponsorsHandler {
+        CosponsorsHandler::new(self)
+    }
+
+    pub fn related_bills(&self) -> RelatedBillsHandler {
+        RelatedBillsHandler::new(self)
+    }
+
+    pub fn subjects(&self) -> SubjectsHandler {
+        SubjectsHandler::new(self)
+    }
+
+    pub fn summaries(&self) -> SummariesHandler {
+        SummariesHandler::new(self)
+    }
+
+    pub fn text(&self) -> TextHandler {
+        TextHandler::new(self)
+    }
+
+    pub fn titles(&self) -> TitlesHandler {
+        TitlesHandler::new(self)
     }
 }
