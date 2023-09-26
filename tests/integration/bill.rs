@@ -1,4 +1,4 @@
-use congress::{prelude::*, ClientBuilder, Result};
+use congress::{bill::actions::ActionsResponse, prelude::*, ClientBuilder, Result};
 
 #[tokio::test]
 async fn bill() -> Result<()> {
@@ -26,9 +26,15 @@ async fn actions() -> Result<()> {
         let _actions = client
             .bill(b.congress, b.bill_type, b.number.parse().unwrap())
             .actions()
+            .limit(2)
             .send()
             .await?;
-        dbg!(&_actions);
+        // for a: &Action in actions().into_iter() {
+            // dbg!(a);
+        // }
+        let next: ActionsResponse = client.next(&_actions).await?.unwrap();
+        dbg!(next);
+        // dbg!(cl & _actions);
     }
 
     Ok(())

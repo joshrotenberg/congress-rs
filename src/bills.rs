@@ -2,7 +2,7 @@ use crate::{
     bill_type::BillType,
     chamber::{Chamber, ChamberCode},
     latest_action::LatestAction,
-    pagination::{PagedResponse, Pagination},
+    pagination::Pagination,
     parameters::{HasParameters, PageParameters, Parameters, SortParameters},
     Client, Result,
 };
@@ -34,16 +34,7 @@ pub struct BillsResponse {
     pagination: Pagination,
 }
 
-impl PagedResponse<Bill> for BillsResponse {
-    fn get_items(&self) -> &Vec<Bill> {
-        &self.bills
-    }
-
-    fn get_pagination(&self) -> &Pagination {
-        &self.pagination
-    }
-}
-crate::pagination::macros::paged_iterator!(BillsResponse, Bill);
+crate::pagination::macros::paged_iterator!(BillsResponse, Bill, bills);
 
 // Handler
 #[derive(Debug)]

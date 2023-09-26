@@ -1,6 +1,6 @@
 use super::BillHandler;
 use crate::{
-    pagination::Pagination,
+    pagination::{PagedResponse, Pagination},
     parameters::{HasParameters, PageParameters, Parameters},
     Result,
 };
@@ -38,6 +38,26 @@ pub struct Action {
 pub struct ActionsResponse {
     pub actions: Vec<Action>,
     pagination: Pagination,
+}
+
+// crate::pagination::macros::paged_iterator!(ActionsResponse, Action, actions);
+impl PagedResponse<Action> for ActionsResponse {
+    fn get_items(&self) -> &Vec<Action> {
+        &self.actions
+    }
+
+    fn get_pagination(&self) -> &Pagination {
+        &self.pagination
+    }
+}
+
+impl<'iter> IntoIterator for &'iter ActionsResponse {
+    type Item = &'iter Action;
+    type IntoIter = std::slice::Iter<'iter, Action>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.get_items().iter()
+    }
 }
 
 #[derive(Debug)]

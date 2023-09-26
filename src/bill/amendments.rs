@@ -29,6 +29,7 @@ pub struct AmendmentsResponse {
     pub amendments: Vec<Amendment>,
     pagination: Pagination,
 }
+crate::pagination::macros::paged_iterator!(AmendmentsResponse, Amendment, amendments);
 
 #[derive(Debug)]
 pub struct AmendmentsHandler<'client> {

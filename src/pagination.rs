@@ -23,7 +23,19 @@ pub trait PagedResponse<T> {
 
 pub(crate) mod macros {
     macro_rules! paged_iterator {
-        ($($name:ident,$type:ident),+) => {$(
+        ($($name:ident,$type:ident,$member:ident),+) => {$(
+
+         use crate::pagination::PagedResponse;
+
+         impl PagedResponse<$type> for $name {
+            fn get_items(&self) -> &Vec<$type> {
+                &self.$member
+            }
+
+            fn get_pagination(&self) -> &Pagination {
+                &self.pagination
+            }
+         }
 
          impl<'iter> IntoIterator for &'iter $name {
              type Item = &'iter $type;
